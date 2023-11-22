@@ -19,5 +19,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Print("data = \n", string(data))
+
+	if *ofile == "" {
+		fmt.Print(string(data))
+	} else {
+		err := os.WriteFile(*ofile, data, 0644)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
