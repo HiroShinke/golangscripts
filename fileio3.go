@@ -35,6 +35,7 @@ func main() {
 		of, err = os.Create(*ofile)
 		defer of.Close()
 		w = bufio.NewWriter(of)
+		defer w.Flush()
 	}
 
 	buff := make([]byte, 512)
