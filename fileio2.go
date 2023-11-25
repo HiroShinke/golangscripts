@@ -16,9 +16,16 @@ func main() {
 	fmt.Print("i = ", *ifile, "\n")
 	fmt.Print("o = ", *ofile, "\n")
 
-	f, err := os.Open(*ifile)
-	if err != nil {
-		panic(err)
+	var f *os.File
+	var err error
+
+	if *ifile == "" {
+		f = os.Stdin
+	} else {
+		f, err = os.Open(*ifile)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	var of *os.File
