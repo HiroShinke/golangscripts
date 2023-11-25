@@ -16,7 +16,7 @@ func do_rec_file(path string, proc func(string, fs.FileInfo) error) error {
 		return err
 	}
 
-	if info.IsDir() {
+	if info.IsDir() && info.Name() != ".git" {
 		entries, err := os.ReadDir(path)
 		if err != nil {
 			return err
