@@ -16,6 +16,10 @@ func do_rec_file(
 	proc func(string, fs.FileInfo) error) error {
 
 	info, err := os.Stat(path)
+	if err != nil {
+		fmt.Print(err)
+		return err
+	}
 	err = proc(path, info)
 	if err != nil {
 		return err
@@ -42,6 +46,8 @@ func main() {
 
 	ifile := flag.String("i", "", "input file")
 	pattern := flag.String("pattern", "", "input file")
+	exext := flag.String("exext", "", "input file")
+	incext := flag.String("incext", "", "input file")
 	flag.Parse()
 	fmt.Print("i = ", *ifile, "\n")
 	fmt.Print("pattern = ", *pattern, "\n")
@@ -49,14 +55,50 @@ func main() {
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
 
+	var exre *regexp.Regexp
+	var err error
+
+	if *exext != "" {
+		exre, err = regexp.Compile(*exext)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		exre = nil
+	}
+
+	var incre *regexp.Regexp
+	if *incext != "" {
+		incre, err = regexp.Compile(*incext)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		incre = nil
+	}
+
+	var re *regexp.Regexp
+	if *pattern != "" {
+		re, err = regexp.Compile(*pattern)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		panic("pattren is required!!")
+	}
+
+	excond := func(name string) bool {
+		return exre == nil || !exre.Match([]byte(name))
+	}
+
+	inccond := func(name string) bool {
+		return incre == nil || incre.Match([]byte(name))
+	}
+
 	proc := func(path string, info fs.FileInfo) error {
 
-		if !info.IsDir() {
+		if !info.IsDir() && excond(info.Name()) && inccond(info.Name()) {
 
-			re, err := regexp.Compile(*pattern)
-			if err != nil {
-				panic(err)
-			}
 			f, err := os.Open(path)
 			if err != nil {
 				panic(err)
