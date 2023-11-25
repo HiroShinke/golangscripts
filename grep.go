@@ -46,16 +46,14 @@ func main() {
 	fmt.Print("i = ", *ifile, "\n")
 	fmt.Print("pattern = ", *pattern, "\n")
 
+	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
+
 	proc := func(path string, info fs.FileInfo) error {
 
 		if !info.IsDir() {
 
-			var r *bufio.Reader
-			var w *bufio.Writer
-			var re *regexp.Regexp
-			var err error
-
-			re, err = regexp.Compile(*pattern)
+			re, err := regexp.Compile(*pattern)
 			if err != nil {
 				panic(err)
 			}
@@ -64,9 +62,7 @@ func main() {
 				panic(err)
 			}
 			defer f.Close()
-			r = bufio.NewReader(f)
-			w = bufio.NewWriter(os.Stdout)
-			defer w.Flush()
+			r := bufio.NewReader(f)
 
 			for {
 				str, err := r.ReadString('\n')
