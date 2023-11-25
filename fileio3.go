@@ -17,22 +17,26 @@ func main() {
 	fmt.Print("i = ", *ifile, "\n")
 	fmt.Print("o = ", *ofile, "\n")
 
-	f, err := os.Open(*ifile)
-	if err != nil {
-		panic(err)
-	}
-
-	var of *os.File
-	r := bufio.NewReader(f)
-
+	var r *bufio.Reader
 	var w *bufio.Writer
+
+	if *ifile == "" {
+		r = bufio.NewReader(os.Stdin)
+	} else {
+		f, err := os.Open(*ifile)
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
+		r = bufio.NewReader(f)
+	}
 
 	if *ofile == "" {
 		w = bufio.NewWriter(os.Stdout)
 		defer w.Flush()
 
 	} else {
-		of, err = os.Create(*ofile)
+		of, _ := os.Create(*ofile)
 		defer of.Close()
 		w = bufio.NewWriter(of)
 		defer w.Flush()
