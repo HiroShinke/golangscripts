@@ -104,7 +104,6 @@ loop:
 				break loop
 			}
 		case <-worker:
-			fmt.Printf("count = %d\n", count)
 			count--
 			if count == 0 {
 				close(worker)
