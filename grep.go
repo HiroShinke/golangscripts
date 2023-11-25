@@ -46,7 +46,7 @@ func main() {
 
 	ifile := flag.String("i", "", "input file")
 	pattern := flag.String("pattern", "", "input file")
-	exext := flag.String("exext", "", "input file")
+	excext := flag.String("excext", "", "input file")
 	incext := flag.String("incext", "", "input file")
 	flag.Parse()
 	fmt.Print("i = ", *ifile, "\n")
@@ -55,16 +55,16 @@ func main() {
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
 
-	var exre *regexp.Regexp
+	var excre *regexp.Regexp
 	var err error
 
-	if *exext != "" {
-		exre, err = regexp.Compile(*exext)
+	if *excext != "" {
+		excre, err = regexp.Compile(*excext)
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		exre = nil
+		excre = nil
 	}
 
 	var incre *regexp.Regexp
@@ -88,7 +88,7 @@ func main() {
 	}
 
 	excond := func(name string) bool {
-		return exre == nil || !exre.Match([]byte(name))
+		return excre == nil || !excre.Match([]byte(name))
 	}
 
 	inccond := func(name string) bool {
