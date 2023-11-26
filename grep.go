@@ -55,29 +55,38 @@ func main() {
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
 
-	var excre *regexp.Regexp
-	var err error
-
+	var exccond func(string) bool
 	if *excext != "" {
-		excre, err = regexp.Compile(*excext)
+		re, err := regexp.Compile(*excext)
 		if err != nil {
 			panic(err)
 		}
+		exccond = func(name string) bool {
+			return !re.Match([]byte(name))
+		}
 	} else {
-		excre = nil
+		exccond = func(name string) bool {
+			return true
+		}
 	}
 
-	var incre *regexp.Regexp
+	var inccond func(string) bool
 	if *incext != "" {
-		incre, err = regexp.Compile(*incext)
+		re, err := regexp.Compile(*incext)
 		if err != nil {
 			panic(err)
 		}
+		inccond = func(name string) bool {
+			return re.Match([]byte(name))
+		}
 	} else {
-		incre = nil
+		inccond = func(name string) bool {
+			return true
+		}
 	}
 
 	var re *regexp.Regexp
+	var err error
 	if *pattern != "" {
 		re, err = regexp.Compile(*pattern)
 		if err != nil {
@@ -87,17 +96,9 @@ func main() {
 		panic("pattren is required!!")
 	}
 
-	excond := func(name string) bool {
-		return excre == nil || !excre.Match([]byte(name))
-	}
-
-	inccond := func(name string) bool {
-		return incre == nil || incre.Match([]byte(name))
-	}
-
 	proc := func(path string, info fs.FileInfo) error {
 
-		if !info.IsDir() && excond(info.Name()) && inccond(info.Name()) {
+		if !info.IsDir() && exccond(info.Name()) && inccond(info.Name()) {
 
 			f, err := os.Open(path)
 			if err != nil {
