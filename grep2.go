@@ -16,6 +16,10 @@ func do_rec_file(
 	proc func(string, fs.FileInfo) error) error {
 
 	info, err := os.Stat(path)
+	if err != nil {
+		fmt.Print(err)
+		return err
+	}
 	err = proc(path, info)
 	if err != nil {
 		return err
